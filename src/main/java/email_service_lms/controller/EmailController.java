@@ -22,8 +22,45 @@ public class EmailController {
     @Autowired
     private RabbitTemplate rabbitTemplate;
 
+    // them thong tin cua order vao day
     @PostMapping("/payment-success")
     public ResponseEntity<String> sendPaymentSuccess(@RequestParam String email, @RequestParam String name) {
+        Map<String, Object> templateData = new HashMap<>();
+        templateData.put("name", name);
+        templateData.put("date", LocalDate.now().format(DateTimeFormatter.ofPattern("dd/MM/yyyy")));
+
+        EmailMessage emailMessage = new EmailMessage(
+                email,
+                "Thanh toán thành công",
+                "payment-success",
+                templateData
+        );
+
+        rabbitTemplate.convertAndSend(RabbitMQConfig.EMAIL_QUEUE, emailMessage);
+        return ResponseEntity.ok("Thông tin gửi email thanh toán đã được đưa vào hàng đợi.");
+    }
+
+    // 2. Endpoint gửi email chấp nhận/từ chối tạo tài khoản giáo viên
+    @PostMapping("/account-request")
+    public ResponseEntity<String> sendAccountRequest(@RequestParam String email, @RequestParam String name) {
+        Map<String, Object> templateData = new HashMap<>();
+        templateData.put("name", name);
+        templateData.put("date", LocalDate.now().format(DateTimeFormatter.ofPattern("dd/MM/yyyy")));
+
+        EmailMessage emailMessage = new EmailMessage(
+                email,
+                "Thanh toán thành công",
+                "payment-success",
+                templateData
+        );
+
+        rabbitTemplate.convertAndSend(RabbitMQConfig.EMAIL_QUEUE, emailMessage);
+        return ResponseEntity.ok("Thông tin gửi email thanh toán đã được đưa vào hàng đợi.");
+    }
+
+    // 3. Endpoint gửi email thông báo lý do khóa tài khoản
+    @PostMapping("/lock-account")
+    public ResponseEntity<String> sendLockAccount(@RequestParam String email, @RequestParam String name) {
         Map<String, Object> templateData = new HashMap<>();
         templateData.put("name", name);
         templateData.put("date", LocalDate.now().format(DateTimeFormatter.ofPattern("dd/MM/yyyy")));
